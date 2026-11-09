@@ -4,6 +4,7 @@ import 'models/destination.dart';
 import 'models/trip_preferences.dart';
 import 'screens/about_screen.dart';
 import 'screens/destination_detail_screen.dart';
+import 'screens/favorites_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/match_screen.dart';
@@ -38,6 +39,7 @@ class AppRoutes {
   static const tripDetail = '/viagem';
   static const profile = '/perfil';
   static const about = '/sobre';
+  static const favorites = '/favoritos';
 
   /// Rotas acessíveis pela barra de navegação inferior, na ordem das abas.
   static const tabs = [home, preferences, myTrips, about];
@@ -62,6 +64,7 @@ class AppRoutes {
       tripDetail when args is int => TripDetailScreen(viagemId: args),
       profile => const ProfileScreen(),
       about => AboutScreen(showNav: args != false),
+      favorites => const FavoritesScreen(),
       _ => const HomeScreen(),
     };
     return MaterialPageRoute(builder: (_) => page, settings: settings);

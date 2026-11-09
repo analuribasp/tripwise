@@ -76,6 +76,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     TwIconButton(
+                      icon: Icons.favorite_border_rounded,
+                      tooltip: 'Meus favoritos',
+                      onPressed: () => _abrir(AppRoutes.favorites),
+                    ),
+                    const SizedBox(width: 8),
+                    TwIconButton(
                       icon: Icons.person_outline_rounded,
                       tooltip: 'Meu perfil',
                       onPressed: () => _abrir(AppRoutes.profile),

@@ -151,4 +151,19 @@ class DestinoRepository {
         'favoritos', {'usuario_id': usuarioId, 'destino_id': destinoId});
     return true;
   }
+
+  /// READ: destinos favoritos do usuário, do mais recente para o mais antigo.
+  static Future<List<Destination>> listarFavoritos(int usuarioId) async {
+    final db = await DatabaseHelper.db();
+    final linhas = await db.query('favoritos',
+        columns: ['destino_id'],
+        where: 'usuario_id = ?',
+        whereArgs: [usuarioId],
+        orderBy: 'criado_em DESC, rowid DESC');
+    final ids = [for (final l in linhas) l['destino_id'] as int];
+    final todos = await listar();
+    return [
+      for (final id in ids) ...todos.where((d) => d.id == id),
+    ];
+  }
 }
