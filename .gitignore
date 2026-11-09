@@ -7,3 +7,13 @@ build/
 *.iml
 .vscode/
 pubspec.lock
+
+# Flutter / Dart
+.pub-cache/
+.pub/
+/coverage/
+*.log
+
+# IDE / SO
+.DS_Store
+Thumbs.db
