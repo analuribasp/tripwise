@@ -116,8 +116,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                       semantic: 'orçamento',
                       onMinus: () => _update(_prefs.copyWith(
                           orcamento: (_prefs.orcamento - 250).clamp(500, 50000))),
-                      onPlus: () => _update(
-                          _prefs.copyWith(orcamento: _prefs.orcamento + 250)),
+                      onPlus: () => _update(_prefs.copyWith(
+                          orcamento: (_prefs.orcamento + 250).clamp(500, 50000))),
                     ),
                   ),
                   const Divider(height: 1, color: AppColors.trilha),
@@ -129,8 +129,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                       semantic: 'dias',
                       onMinus: () => _update(_prefs.copyWith(
                           dias: (_prefs.dias - 1).clamp(1, 60))),
-                      onPlus: () =>
-                          _update(_prefs.copyWith(dias: _prefs.dias + 1)),
+                      onPlus: () => _update(_prefs.copyWith(
+                          dias: (_prefs.dias + 1).clamp(1, 60))),
                     ),
                   ),
                   const Divider(height: 1, color: AppColors.trilha),
@@ -144,8 +144,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                       semantic: 'pessoas',
                       onMinus: () => _update(_prefs.copyWith(
                           pessoas: (_prefs.pessoas - 1).clamp(1, 20))),
-                      onPlus: () =>
-                          _update(_prefs.copyWith(pessoas: _prefs.pessoas + 1)),
+                      onPlus: () => _update(_prefs.copyWith(
+                          pessoas: (_prefs.pessoas + 1).clamp(1, 20))),
                     ),
                   ),
                 ],
