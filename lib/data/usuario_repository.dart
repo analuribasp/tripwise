@@ -116,6 +116,37 @@ class UsuarioRepository {
     });
   }
 
+  /// UPDATE: troca a senha depois de conferir a senha atual.
+  static Future<void> alterarSenha(
+    int id, {
+    required String senhaAtual,
+    required String novaSenha,
+  }) async {
+    final db = await DatabaseHelper.db();
+    final linhas = await db.query('usuarios',
+        columns: ['email', 'senha_hash'],
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1);
+    if (linhas.isEmpty) {
+      throw const UsuarioException('Usuário não encontrado.');
+    }
+    final email = linhas.first['email'] as String;
+    if (linhas.first['senha_hash'] != hashSenha(email, senhaAtual)) {
+      throw const UsuarioException('Senha atual incorreta.');
+    }
+    if (novaSenha.length < 6) {
+      throw const UsuarioException(
+          'A nova senha precisa ter pelo menos 6 caracteres.');
+    }
+    await db.update(
+      'usuarios',
+      {'senha_hash': hashSenha(email, novaSenha)},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   /// DELETE: exclui a conta. Viagens, roteiros, buscas e favoritos
   /// são apagados em cascata (ON DELETE CASCADE).
   static Future<void> excluir(int id) async {

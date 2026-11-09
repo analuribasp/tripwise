@@ -73,6 +73,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     mostrarAviso(context, 'Perfil atualizado.');
   }
 
+  /// Abre o diálogo de troca de senha.
+  Future<void> _alterarSenha() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => const _AlterarSenhaDialog(),
+    );
+    if (ok == true && mounted) mostrarAviso(context, 'Senha alterada.');
+  }
+
   Future<void> _sair() async {
     await Session.sair();
     if (!mounted) return;
@@ -165,6 +174,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
                     OutlinedButton.icon(
+                      onPressed: _alterarSenha,
+                      icon: const Icon(Icons.lock_outline_rounded),
+                      label: const Text('Alterar senha'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.azulMarinho,
+                        minimumSize: const Size.fromHeight(48),
+                        side: const BorderSide(color: AppColors.bordaInput),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    OutlinedButton.icon(
                       onPressed: _sair,
                       icon: const Icon(Icons.logout),
                       label: const Text('Sair da conta'),
@@ -188,6 +210,119 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
       ),
+    );
+  }
+}
+
+
+/// Diálogo de troca de senha: confere a senha atual e grava a nova.
+class _AlterarSenhaDialog extends StatefulWidget {
+  const _AlterarSenhaDialog();
+
+  @override
+  State<_AlterarSenhaDialog> createState() => _AlterarSenhaDialogState();
+}
+
+class _AlterarSenhaDialogState extends State<_AlterarSenhaDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _atual = TextEditingController();
+  final _nova = TextEditingController();
+  final _confirmar = TextEditingController();
+  String? _erro;
+  bool _salvando = false;
+
+  @override
+  void dispose() {
+    for (final c in [_atual, _nova, _confirmar]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _salvar() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _salvando = true;
+      _erro = null;
+    });
+    try {
+      await UsuarioRepository.alterarSenha(
+        Session.usuarioId!,
+        senhaAtual: _atual.text,
+        novaSenha: _nova.text,
+      );
+      if (mounted) Navigator.pop(context, true);
+    } on UsuarioException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _erro = e.mensagem;
+        _salvando = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppColors.offWhite,
+      title: const Text('Alterar senha'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LabeledField(
+                label: 'Senha atual',
+                hint: '••••••••',
+                controller: _atual,
+                obscure: true,
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? 'Informe a senha atual' : null,
+              ),
+              const SizedBox(height: 10),
+              LabeledField(
+                label: 'Nova senha',
+                hint: '••••••••',
+                controller: _nova,
+                obscure: true,
+                validator: (v) =>
+                    (v == null || v.length < 6) ? 'Mínimo 6 caracteres' : null,
+              ),
+              const SizedBox(height: 10),
+              LabeledField(
+                label: 'Confirmar nova senha',
+                hint: '••••••••',
+                controller: _confirmar,
+                obscure: true,
+                textInputAction: TextInputAction.done,
+                validator: (v) => v != _nova.text ? 'Senhas diferentes' : null,
+              ),
+              if (_erro != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  _erro!,
+                  style: const TextStyle(
+                    color: AppColors.coralEscuro,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _salvando ? null : () => Navigator.pop(context, false),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: _salvando ? null : _salvar,
+          style: FilledButton.styleFrom(backgroundColor: AppColors.azulMarinho),
+          child: Text(_salvando ? 'Salvando…' : 'Alterar senha'),
+        ),
+      ],
     );
   }
 }
